@@ -1,0 +1,8 @@
+{
+  "name": "Remix Liberação Miofascial Renata Okoti verso APK",
+  "description": "Sistema de agenda e gestão de atendimentos de Liberação Miofascial - Renata Okoti. Controle de sessões avulsas (R$ 150) e pacotes de 4 atendimentos (R$ 500) com aviso automático na 4ª sessão.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
