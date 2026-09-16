@@ -24,16 +24,27 @@ import { AppointmentModal } from './components/AppointmentModal';
 import { AppointmentDetailModal } from './components/AppointmentDetailModal';
 import { PricingConfigModal } from './components/PricingConfigModal';
 import { NextDayRemindersAlert } from './components/NextDayRemindersAlert';
+import { AndroidInstallModal } from './components/AndroidInstallModal';
+import { DatabaseManagerModal } from './components/DatabaseManagerModal';
+import { AndroidBottomNav } from './components/AndroidBottomNav';
+import { OfflineIndicator } from './components/OfflineIndicator';
+import { usePWAInstall } from './hooks/usePWAInstall';
 
-const STORAGE_PACIENTES = 'agenda_miofascial_pacientes_v3';
-const STORAGE_AGENDAMENTOS = 'agenda_miofascial_agendamentos_v3';
+// Chaves de armazenamento persistente com banco de dados zerado por padrão
+const STORAGE_PACIENTES = 'agenda_miofascial_apk_pacientes_v1';
+const STORAGE_AGENDAMENTOS = 'agenda_miofascial_apk_agendamentos_v1';
 
 export default function App() {
+  // PWA e suporte à instalação do APK Android
+  const { isInstallable, isInstalled, install } = usePWAInstall();
+  const [isModalInstallOpen, setIsModalInstallOpen] = useState<boolean>(false);
+  const [isModalDatabaseOpen, setIsModalDatabaseOpen] = useState<boolean>(false);
+
   // Configuração dinâmica de preços (avulso vs pacote e quantidade de sessões)
   const [configPrecos, setConfigPrecos] = useState<ConfiguracaoPrecos>(() => carregarConfiguracaoPrecos());
   const [isModalPricingOpen, setIsModalPricingOpen] = useState<boolean>(false);
 
-  // Estado de Pacientes e Agendamentos persistidos em localStorage
+  // Estado de Pacientes e Agendamentos persistidos em localStorage - BANCO DE DADOS ZERADO POR PADRÃO
   const [pacientes, setPacientes] = useState<Paciente[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_PACIENTES);
@@ -41,7 +52,7 @@ export default function App() {
     } catch (e) {
       console.error('Erro ao ler pacientes do localStorage:', e);
     }
-    return PACIENTES_INICIAIS;
+    return []; // Inicia com banco de dados zerado
   });
 
   const [agendamentos, setAgendamentos] = useState<Agendamento[]>(() => {
@@ -51,7 +62,7 @@ export default function App() {
     } catch (e) {
       console.error('Erro ao ler agendamentos do localStorage:', e);
     }
-    return AGENDAMENTOS_INICIAIS;
+    return []; // Inicia com banco de dados zerado
   });
 
   useEffect(() => {
@@ -324,18 +335,43 @@ export default function App() {
     setIsModalNovoAgendamentoOpen(true);
   };
 
-  const handleResetarDados = () => {
-    if (window.confirm('Deseja restaurar os dados originais da clínica de Renata Okoti?')) {
-      setPacientes(PACIENTES_INICIAIS);
-      setAgendamentos(AGENDAMENTOS_INICIAIS);
-      localStorage.removeItem(STORAGE_PACIENTES);
-      localStorage.removeItem(STORAGE_AGENDAMENTOS);
-      mostrarNotificacao('Dados originais restaurados com sucesso.');
-    }
+  const handleZerarBanco = () => {
+    setPacientes([]);
+    setAgendamentos([]);
+    localStorage.removeItem(STORAGE_PACIENTES);
+    localStorage.removeItem(STORAGE_AGENDAMENTOS);
+    setIsModalDatabaseOpen(false);
+    mostrarNotificacao('Banco de dados zerado com sucesso! Sistema limpo e pronto.');
   };
+
+  const handleCarregarExemplo = () => {
+    setPacientes(PACIENTES_INICIAIS);
+    setAgendamentos(AGENDAMENTOS_INICIAIS);
+    setIsModalDatabaseOpen(false);
+    mostrarNotificacao('Dados de demonstração carregados na agenda.');
+  };
+
+  const handleImportarDados = (dados: { pacientes: Paciente[]; agendamentos: Agendamento[]; configPrecos?: ConfiguracaoPrecos }) => {
+    setPacientes(dados.pacientes);
+    setAgendamentos(dados.agendamentos);
+    if (dados.configPrecos) {
+      setConfigPrecos(dados.configPrecos);
+      salvarConfiguracaoPrecos(dados.configPrecos);
+    }
+    mostrarNotificacao(`Backup importado: ${dados.pacientes.length} pacientes e ${dados.agendamentos.length} agendamentos.`);
+  };
+
+  const handleResetarDados = () => {
+    setIsModalDatabaseOpen(true);
+  };
+
+  const isBancoZerado = pacientes.length === 0 && agendamentos.length === 0;
 
   return (
     <div className="min-h-screen bg-stone-100 text-stone-900 flex flex-col font-sans selection:bg-teal-200">
+      {/* Indicador de Status Offline / PWA */}
+      <OfflineIndicator />
+
       {/* Top Header with Navigation Tabs */}
       <Header
         abaAtiva={abaAtiva}
@@ -349,10 +385,15 @@ export default function App() {
         onResetarDados={handleResetarDados}
         configPrecos={configPrecos}
         onAbrirConfigPrecos={() => setIsModalPricingOpen(true)}
+        onAbrirModalInstalar={() => setIsModalInstallOpen(true)}
+        onAbrirModalBanco={() => setIsModalDatabaseOpen(true)}
+        isBancoZerado={isBancoZerado}
+        isInstallable={isInstallable}
+        isInstalled={isInstalled}
       />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-5">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-8 space-y-5">
         {/* Toast Notification */}
         {notificacao && (
           <div className={`fixed bottom-5 right-5 z-50 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl border flex items-center gap-2.5 max-w-md ${
@@ -479,6 +520,37 @@ export default function App() {
         onClose={() => setIsModalPricingOpen(false)}
         configAtual={configPrecos}
         onSalvar={handleSalvarConfigPrecos}
+      />
+
+      {/* Barra de Navegação Inferior Nativa para Android APK */}
+      <AndroidBottomNav
+        abaAtiva={abaAtiva}
+        onAbaChange={setAbaAtiva}
+        onAbrirModalInstalar={() => setIsModalInstallOpen(true)}
+        onAbrirModalBanco={() => setIsModalDatabaseOpen(true)}
+        isInstallable={isInstallable}
+        totalPacientes={pacientes.length}
+      />
+
+      {/* Modal Instalação APK Android */}
+      <AndroidInstallModal
+        isOpen={isModalInstallOpen}
+        onClose={() => setIsModalInstallOpen(false)}
+        isInstalled={isInstalled}
+        isInstallable={isInstallable}
+        onTriggerInstall={install}
+      />
+
+      {/* Modal Gerenciador do Banco de Dados (Zerar / Backup / Restaurar) */}
+      <DatabaseManagerModal
+        isOpen={isModalDatabaseOpen}
+        onClose={() => setIsModalDatabaseOpen(false)}
+        pacientes={pacientes}
+        agendamentos={agendamentos}
+        configPrecos={configPrecos}
+        onZerarBanco={handleZerarBanco}
+        onCarregarExemplo={handleCarregarExemplo}
+        onImportarDados={handleImportarDados}
       />
     </div>
   );
