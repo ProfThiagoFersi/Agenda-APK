@@ -1,0 +1,9 @@
+{
+  "appId": "com.renataokoti.miofascial",
+  "appName": "Renata Okoti - Liberação Miofascial",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}

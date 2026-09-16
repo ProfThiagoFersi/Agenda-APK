@@ -10,7 +10,8 @@ import {
   Settings2,
   Smartphone,
   Database,
-  CheckCircle2
+  CheckCircle2,
+  Package
 } from 'lucide-react';
 import { ConfiguracaoPrecos } from '../types';
 
@@ -95,12 +96,12 @@ export const Header: React.FC<HeaderProps> = ({
               id="btn-instalar-apk"
               type="button"
               onClick={onAbrirModalInstalar}
-              title="Instalar aplicativo APK no Android"
-              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 active:scale-95 text-white rounded-xl text-xs font-bold shadow-xs transition-all min-h-[38px] border border-amber-500/40"
+              title="Empacotar ou baixar arquivo .APK autônomo para Android"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-2 bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-600 hover:to-teal-700 active:scale-95 text-white rounded-xl text-xs font-bold shadow-xs transition-all min-h-[38px] border border-teal-500/40 cursor-pointer"
             >
-              <Smartphone className="w-3.5 h-3.5 shrink-0 animate-pulse" />
-              <span className="hidden sm:inline">Instalar APK</span>
-              <span className="sm:hidden">APK</span>
+              <Package className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden sm:inline">Empacotar .APK</span>
+              <span className="sm:hidden">.APK</span>
             </button>
 
             {/* Botão Banco de Dados (Zerado / Backup) */}
