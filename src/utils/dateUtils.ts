@@ -52,8 +52,12 @@ export function calcularHorarioFim(horarioInicio: string, duracaoMinutos: number
 }
 
 export function obterHojeString(): string {
-  // Retorna a data padrão do sistema ou contexto (2026-09-15)
-  return '2026-09-15';
+  // Retorna a data atual do sistema Android / dispositivo
+  const agora = new Date();
+  const ano = agora.getFullYear();
+  const mes = String(agora.getMonth() + 1).padStart(2, '0');
+  const dia = String(agora.getDate()).padStart(2, '0');
+  return `${ano}-${mes}-${dia}`;
 }
 
 export function somarDias(dataStr: string, dias: number): string {

@@ -86,6 +86,7 @@ export interface ConfiguracaoPrecos {
   precoAvulso: number; // Ex: 150
   precoPacote: number; // Ex: 500
   sessoesPorPacote: number; // Ex: 4
+  validadeDiasPacote?: number; // Ex: 90 dias
 }
 
 export interface LembreteAutomatico {

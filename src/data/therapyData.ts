@@ -1,4 +1,5 @@
 import { Paciente, Agendamento, TipoTerapia, StatusAgendamento, ZonaFascial } from '../types';
+import { obterHojeString, somarDias } from '../utils/dateUtils';
 
 export const PRECO_AVULSO = 150;
 export const PRECO_PACOTE = 500;
@@ -796,13 +797,13 @@ export const AGENDAMENTOS_INICIAIS: Agendamento[] = [
     criadoEm: '2026-08-19T14:00:00Z'
   },
 
-  // --- Atendimentos do Dia Atual (15 de Setembro de 2026) ---
+  // --- Atendimentos do Dia Atual (calculado dinamicamente com base na data do dispositivo Android / Sistema) ---
   {
     id: 'ag_1',
     pacienteId: 'pac_1',
     pacienteNome: 'Mariana Duarte Souza',
     pacienteTelefone: '(11) 98765-4321',
-    data: '2026-09-15',
+    data: obterHojeString(),
     horario: '08:30',
     duracaoMinutos: 60,
     tipoTerapia: 'manual',
@@ -826,7 +827,7 @@ export const AGENDAMENTOS_INICIAIS: Agendamento[] = [
     pacienteId: 'pac_2',
     pacienteNome: 'Lucas Albuquerque Mendes',
     pacienteTelefone: '(11) 97123-8899',
-    data: '2026-09-15',
+    data: obterHojeString(),
     horario: '10:00',
     duracaoMinutos: 60,
     tipoTerapia: 'instrumental',
@@ -850,7 +851,7 @@ export const AGENDAMENTOS_INICIAIS: Agendamento[] = [
     pacienteId: 'pac_3',
     pacienteNome: 'Rodrigo Pires Sanches',
     pacienteTelefone: '(11) 99455-1200',
-    data: '2026-09-15',
+    data: obterHojeString(),
     horario: '11:30',
     duracaoMinutos: 60,
     tipoTerapia: 'ventosa',
@@ -871,7 +872,7 @@ export const AGENDAMENTOS_INICIAIS: Agendamento[] = [
     pacienteId: 'pac_4',
     pacienteNome: 'Camila Fernandes Vianna',
     pacienteTelefone: '(11) 98341-9011',
-    data: '2026-09-15',
+    data: obterHojeString(),
     horario: '14:30',
     duracaoMinutos: 60,
     tipoTerapia: 'postural',
@@ -892,7 +893,7 @@ export const AGENDAMENTOS_INICIAIS: Agendamento[] = [
     pacienteId: 'pac_5',
     pacienteNome: 'Gustavo Henrique Ramos',
     pacienteTelefone: '(11) 97652-3344',
-    data: '2026-09-15',
+    data: obterHojeString(),
     horario: '16:00',
     duracaoMinutos: 45,
     tipoTerapia: 'dry_needling',
@@ -911,7 +912,7 @@ export const AGENDAMENTOS_INICIAIS: Agendamento[] = [
     pacienteId: 'pac_1',
     pacienteNome: 'Lucas Silveira',
     pacienteTelefone: '(11) 98765-4321',
-    data: '2026-09-16',
+    data: somarDias(obterHojeString(), 1),
     horario: '09:00',
     duracaoMinutos: 60,
     tipoTerapia: 'manual',
@@ -932,7 +933,7 @@ export const AGENDAMENTOS_INICIAIS: Agendamento[] = [
     pacienteId: 'pac_2',
     pacienteNome: 'Amanda Castro',
     pacienteTelefone: '(11) 99123-4567',
-    data: '2026-09-16',
+    data: somarDias(obterHojeString(), 1),
     horario: '11:00',
     duracaoMinutos: 60,
     tipoTerapia: 'postural',
@@ -953,7 +954,7 @@ export const AGENDAMENTOS_INICIAIS: Agendamento[] = [
     pacienteId: 'pac_4',
     pacienteNome: 'Rafael Souza',
     pacienteTelefone: '(11) 98877-6655',
-    data: '2026-09-16',
+    data: somarDias(obterHojeString(), 1),
     horario: '15:00',
     duracaoMinutos: 60,
     tipoTerapia: 'esportiva',

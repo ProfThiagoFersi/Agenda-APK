@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Agendamento } from '../types';
 import { STATUS_CONFIG } from '../data/therapyData';
+import { obterHojeString } from '../utils/dateUtils';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 
 interface MonthlyViewProps {
@@ -18,8 +19,20 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
   onNovoAgendamentoNoDia,
   dataAtiva,
 }) => {
-  const [ano, setAno] = useState<number>(2026);
-  const [mes, setMes] = useState<number>(8); // 8 = Setembro (0-indexado)
+  const [ano, setAno] = useState<number>(() => {
+    if (dataAtiva) {
+      const parts = dataAtiva.split('-').map(Number);
+      if (parts[0]) return parts[0];
+    }
+    return new Date().getFullYear();
+  });
+  const [mes, setMes] = useState<number>(() => {
+    if (dataAtiva) {
+      const parts = dataAtiva.split('-').map(Number);
+      if (!isNaN(parts[1])) return parts[1] - 1;
+    }
+    return new Date().getMonth();
+  });
 
   const primeiroDiaDoMes = new Date(ano, mes, 1);
   const ultimoDiaDoMes = new Date(ano, mes + 1, 0);
@@ -67,8 +80,10 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
           <button
             type="button"
             onClick={() => {
-              setAno(2026);
-              setMes(8);
+              const hoje = new Date();
+              setAno(hoje.getFullYear());
+              setMes(hoje.getMonth());
+              onSelectData(obterHojeString());
             }}
             className="px-3 py-1.5 text-xs font-semibold text-stone-700 hover:text-teal-900 hover:bg-stone-100 rounded-lg border border-stone-200 transition-colors"
           >
@@ -107,7 +122,7 @@ export const MonthlyView: React.FC<MonthlyViewProps> = ({
 
             const { dia, dataStr } = celula;
             const sessoesNesteDia = agendamentos.filter((a) => a.data === dataStr);
-            const isHoje = dataStr === '2026-09-15';
+            const isHoje = dataStr === obterHojeString();
             const isSelecionado = dataStr === dataAtiva;
 
             return (

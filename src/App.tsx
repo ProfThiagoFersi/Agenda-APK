@@ -12,7 +12,7 @@ import {
   PRECO_PACOTE
 } from './data/therapyData';
 import { carregarConfiguracaoPrecos, salvarConfiguracaoPrecos } from './utils/pricingUtils';
-import { formatarMoeda } from './utils/dateUtils';
+import { formatarMoeda, obterHojeString } from './utils/dateUtils';
 import { Header, AbaNavegacao } from './components/Header';
 import { QuickStats } from './components/QuickStats';
 import { AppointmentFilters } from './components/AppointmentFilters';
@@ -27,6 +27,7 @@ import { NextDayRemindersAlert } from './components/NextDayRemindersAlert';
 import { AndroidInstallModal } from './components/AndroidInstallModal';
 import { DatabaseManagerModal } from './components/DatabaseManagerModal';
 import { AndroidBottomNav } from './components/AndroidBottomNav';
+import { SettingsView } from './components/SettingsView';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { usePWAInstall } from './hooks/usePWAInstall';
 
@@ -81,9 +82,9 @@ export default function App() {
     }
   }, [agendamentos]);
 
-  // Controle de Navegação e Datas
+  // Controle de Navegação e Datas (baseado no relógio atual do Android / Sistema)
   const [abaAtiva, setAbaAtiva] = useState<AbaNavegacao>('diaria');
-  const [dataSelecionada, setDataSelecionada] = useState<string>('2026-09-15');
+  const [dataSelecionada, setDataSelecionada] = useState<string>(() => obterHojeString());
 
   // Filtros
   const [filtros, setFiltros] = useState<FiltrosAgenda>({
@@ -97,7 +98,7 @@ export default function App() {
   const [agendamentoParaEditar, setAgendamentoParaEditar] = useState<Agendamento | null>(null);
   const [agendamentoDetalhe, setAgendamentoDetalhe] = useState<Agendamento | null>(null);
   const [horarioPredefinido, setHorarioPredefinido] = useState<string>('09:00');
-  const [dataPredefinida, setDataPredefinida] = useState<string>('2026-09-15');
+  const [dataPredefinida, setDataPredefinida] = useState<string>(() => obterHojeString());
 
   // Feedback Notification
   const [notificacao, setNotificacao] = useState<{ mensagem: string; tipo?: 'info' | 'alerta' } | null>(null);
@@ -382,14 +383,6 @@ export default function App() {
           setHorarioPredefinido('09:00');
           setIsModalNovoAgendamentoOpen(true);
         }}
-        onResetarDados={handleResetarDados}
-        configPrecos={configPrecos}
-        onAbrirConfigPrecos={() => setIsModalPricingOpen(true)}
-        onAbrirModalInstalar={() => setIsModalInstallOpen(true)}
-        onAbrirModalBanco={() => setIsModalDatabaseOpen(true)}
-        isBancoZerado={isBancoZerado}
-        isInstallable={isInstallable}
-        isInstalled={isInstalled}
       />
 
       {/* Main Container */}
@@ -408,25 +401,29 @@ export default function App() {
           </div>
         )}
 
-        {/* Quick Clinical Metrics */}
-        <QuickStats
-          agendamentos={agendamentos}
-          dataHoje={dataSelecionada}
-        />
+        {/* Quick Clinical Metrics - Oculto na aba de configurações para manter tela limpa */}
+        {abaAtiva !== 'configuracoes' && (
+          <>
+            <QuickStats
+              agendamentos={agendamentos}
+              dataHoje={dataSelecionada}
+            />
 
-        {/* 🔔 Alerta Persistente e Agendamento Automático de Lembretes para o Dia Seguinte */}
-        <NextDayRemindersAlert
-          agendamentos={agendamentos}
-          dataReferencia={dataSelecionada}
-          onVerDetalhesAgendamento={(id) => {
-            const ag = agendamentos.find((a) => a.id === id);
-            if (ag) setAgendamentoDetalhe(ag);
-          }}
-          onNotificar={mostrarNotificacao}
-        />
+            {/* 🔔 Alerta Persistente e Agendamento Automático de Lembretes para o Dia Seguinte */}
+            <NextDayRemindersAlert
+              agendamentos={agendamentos}
+              dataReferencia={dataSelecionada}
+              onVerDetalhesAgendamento={(id) => {
+                const ag = agendamentos.find((a) => a.id === id);
+                if (ag) setAgendamentoDetalhe(ag);
+              }}
+              onNotificar={mostrarNotificacao}
+            />
+          </>
+        )}
 
         {/* Global Appointment Filters */}
-        {abaAtiva !== 'pacientes' && (
+        {abaAtiva !== 'pacientes' && abaAtiva !== 'configuracoes' && (
           <AppointmentFilters
             filtros={filtros}
             onChange={setFiltros}
@@ -486,6 +483,22 @@ export default function App() {
             onAbrirConfigPrecos={() => setIsModalPricingOpen(true)}
           />
         )}
+
+        {abaAtiva === 'configuracoes' && (
+          <SettingsView
+            configPrecos={configPrecos}
+            onSalvarConfigPrecos={handleSalvarConfigPrecos}
+            pacientes={pacientes}
+            agendamentos={agendamentos}
+            onZerarBanco={handleZerarBanco}
+            onCarregarExemplo={handleCarregarExemplo}
+            onImportarDados={handleImportarDados}
+            onAbrirModalInstalar={() => setIsModalInstallOpen(true)}
+            isInstalled={isInstalled}
+            isInstallable={isInstallable}
+            onTriggerInstall={install}
+          />
+        )}
       </main>
 
       {/* Modal Criar / Editar Agendamento */}
@@ -526,9 +539,6 @@ export default function App() {
       <AndroidBottomNav
         abaAtiva={abaAtiva}
         onAbaChange={setAbaAtiva}
-        onAbrirModalInstalar={() => setIsModalInstallOpen(true)}
-        onAbrirModalBanco={() => setIsModalDatabaseOpen(true)}
-        isInstallable={isInstallable}
         totalPacientes={pacientes.length}
       />
 

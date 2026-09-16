@@ -1,22 +1,19 @@
 import React from 'react';
-import { Calendar, CalendarDays, CalendarRange, Users, Smartphone, Database } from 'lucide-react';
+import { Calendar, CalendarDays, CalendarRange, Users, Settings } from 'lucide-react';
 import { AbaNavegacao } from './Header';
 
 interface AndroidBottomNavProps {
   abaAtiva: AbaNavegacao;
   onAbaChange: (aba: AbaNavegacao) => void;
-  onAbrirModalInstalar: () => void;
-  onAbrirModalBanco: () => void;
-  isInstallable: boolean;
+  onAbrirModalInstalar?: () => void;
+  onAbrirModalBanco?: () => void;
+  isInstallable?: boolean;
   totalPacientes: number;
 }
 
 export const AndroidBottomNav: React.FC<AndroidBottomNavProps> = ({
   abaAtiva,
   onAbaChange,
-  onAbrirModalInstalar,
-  onAbrirModalBanco,
-  isInstallable,
   totalPacientes,
 }) => {
   return (
@@ -84,14 +81,18 @@ export const AndroidBottomNav: React.FC<AndroidBottomNavProps> = ({
           )}
         </button>
 
-        {/* APK Android / Banco */}
+        {/* Configurações */}
         <button
           type="button"
-          onClick={onAbrirModalInstalar}
-          className="flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all min-h-[48px] text-amber-400 hover:text-amber-300"
+          onClick={() => onAbaChange('configuracoes')}
+          className={`flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition-all min-h-[48px] ${
+            abaAtiva === 'configuracoes'
+              ? 'text-teal-300 bg-stone-800/80 font-bold scale-102'
+              : 'hover:text-stone-200'
+          }`}
         >
-          <Smartphone className="w-5 h-5 mb-0.5" />
-          <span className="text-[10px] leading-tight font-semibold">APK</span>
+          <Settings className="w-5 h-5 mb-0.5" />
+          <span className="text-[10px] leading-tight font-medium">Ajustes</span>
         </button>
       </div>
     </nav>

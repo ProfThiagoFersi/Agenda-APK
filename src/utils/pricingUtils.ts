@@ -4,6 +4,7 @@ export const CONFIG_PRECOS_PADRAO: ConfiguracaoPrecos = {
   precoAvulso: 150,
   precoPacote: 500,
   sessoesPorPacote: 4,
+  validadeDiasPacote: 90,
 };
 
 export const STORAGE_KEY_PRECOS = 'agenda_miofascial_config_precos_v1';
@@ -20,6 +21,7 @@ export function carregarConfiguracaoPrecos(): ConfiguracaoPrecos {
         precoAvulso: Number(parsed.precoAvulso) > 0 ? Number(parsed.precoAvulso) : CONFIG_PRECOS_PADRAO.precoAvulso,
         precoPacote: Number(parsed.precoPacote) > 0 ? Number(parsed.precoPacote) : CONFIG_PRECOS_PADRAO.precoPacote,
         sessoesPorPacote: Number(parsed.sessoesPorPacote) > 0 ? Number(parsed.sessoesPorPacote) : CONFIG_PRECOS_PADRAO.sessoesPorPacote,
+        validadeDiasPacote: Number(parsed.validadeDiasPacote) > 0 ? Number(parsed.validadeDiasPacote) : (CONFIG_PRECOS_PADRAO.validadeDiasPacote || 90),
       };
     }
   } catch (e) {

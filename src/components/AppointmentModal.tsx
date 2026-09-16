@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Agendamento, Paciente, TipoTerapia, StatusAgendamento, ModalidadeCobranca, ConfiguracaoPrecos } from '../types';
 import { TIPOS_TERAPIA_CONFIG, STATUS_CONFIG, PRECO_AVULSO, PRECO_PACOTE } from '../data/therapyData';
 import { CONFIG_PRECOS_PADRAO } from '../utils/pricingUtils';
-import { formatarMoeda } from '../utils/dateUtils';
+import { formatarMoeda, obterHojeString } from '../utils/dateUtils';
 import { BodyMapSelector } from './BodyMapSelector';
 import { X, Calendar, Clock, DollarSign, User, AlertCircle, Sparkles, Package, AlertTriangle, CheckCircle } from 'lucide-react';
 
@@ -27,10 +27,11 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
   onSave,
   agendamentoParaEditar,
   pacientes,
-  dataInicial = '2026-09-15',
+  dataInicial,
   horarioInicial = '09:00',
   configPrecos = CONFIG_PRECOS_PADRAO,
 }) => {
+  const dataPadraoEfetiva = dataInicial || obterHojeString();
   const precoAvulsoPadrao = configPrecos.precoAvulso || PRECO_AVULSO;
   const precoPacotePadrao = configPrecos.precoPacote || PRECO_PACOTE;
   const totalSessoesPacotePadrao = configPrecos.sessoesPorPacote || 4;
@@ -43,7 +44,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
   const [novoEmail, setNovoEmail] = useState<string>('');
   const [novaQueixa, setNovaQueixa] = useState<string>('');
 
-  const [data, setData] = useState<string>(dataInicial);
+  const [data, setData] = useState<string>(dataPadraoEfetiva);
   const [horario, setHorario] = useState<string>(horarioInicial);
   const [duracaoMinutos, setDuracaoMinutos] = useState<number>(60);
   const [tipoTerapia, setTipoTerapia] = useState<TipoTerapia>('manual');
@@ -91,7 +92,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
       setCondutaTerapeutica(agendamentoParaEditar.condutaTerapeutica || '');
       setRecomendacoesHomeCare(agendamentoParaEditar.recomendacoesHomeCare || '');
     } else {
-      setData(dataInicial);
+      setData(dataPadraoEfetiva);
       setHorario(horarioInicial);
       if (pacientes.length > 0 && !pacienteId) {
         setPacienteId(pacientes[0].id);

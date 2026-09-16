@@ -5,7 +5,8 @@ import {
   formatarDataExtenso, 
   calcularHorarioFim, 
   formatarMoeda, 
-  somarDias 
+  somarDias,
+  obterHojeString
 } from '../utils/dateUtils';
 import { 
   ChevronLeft, 
@@ -76,7 +77,7 @@ export const DailyTimelineView: React.FC<DailyTimelineViewProps> = ({
 
               <button
                 type="button"
-                onClick={() => onDataChange('2026-09-15')}
+                onClick={() => onDataChange(obterHojeString())}
                 className="px-3 py-2 text-xs font-semibold text-stone-700 hover:text-teal-900 active:bg-stone-200 hover:bg-stone-100 rounded-xl border border-stone-200 transition-colors min-h-[40px]"
               >
                 Hoje

@@ -5,7 +5,8 @@ import {
   formatarDataCurta, 
   formatarDiaSemanaCurto, 
   somarDias, 
-  formatarMoeda 
+  formatarMoeda,
+  obterHojeString
 } from '../utils/dateUtils';
 import { ChevronLeft, ChevronRight, Plus, Clock, Activity } from 'lucide-react';
 
@@ -62,7 +63,7 @@ export const WeeklyView: React.FC<WeeklyViewProps> = ({
 
           <button
             type="button"
-            onClick={() => onDataChange('2026-09-15')}
+            onClick={() => onDataChange(obterHojeString())}
             className="px-3 py-2 text-xs font-semibold text-stone-700 hover:text-teal-900 active:bg-stone-200 hover:bg-stone-100 rounded-xl border border-stone-200 transition-colors min-h-[40px]"
           >
             Semana Atual
@@ -92,7 +93,7 @@ export const WeeklyView: React.FC<WeeklyViewProps> = ({
       <div className="flex md:hidden items-center gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 no-scrollbar">
         {diasDaSemana.map((diaStr) => {
           const sessoesCount = agendamentos.filter((a) => a.data === diaStr).length;
-          const isHoje = diaStr === '2026-09-15';
+          const isHoje = diaStr === obterHojeString();
           const diaNome = formatarDiaSemanaCurto(diaStr);
           const diaNum = diaStr.split('-')[2];
 
@@ -127,7 +128,7 @@ export const WeeklyView: React.FC<WeeklyViewProps> = ({
             .filter((a) => a.data === diaStr)
             .sort((a, b) => a.horario.localeCompare(b.horario));
 
-          const isHoje = diaStr === '2026-09-15';
+          const isHoje = diaStr === obterHojeString();
           const diaNome = formatarDiaSemanaCurto(diaStr);
 
           return (
